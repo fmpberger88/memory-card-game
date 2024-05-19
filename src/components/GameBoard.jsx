@@ -11,11 +11,19 @@ const GameBoard = () => {
     const [maxScore, setMaxScore] = useState(0);
     const [gameOver, setGameOver] = useState(false);
     const [isAnimating, setIsAnimating] = useState(false);
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const loadPokemons = async () => {
-            const pokemons = await fetchPokemonIds();
-            setCards(pokemons.map((pokemon, index) => ({ ...pokemon, id: index, flipped: true })));
+            try {
+                const pokemons = await fetchPokemonIds();
+                setCards(pokemons.map((pokemon, index) => ({ ...pokemon, id: index, flipped: true })));
+                await setLoading(false);
+            } catch (error) {
+                setError(error);
+            }
+
         };
 
         loadPokemons();
@@ -64,6 +72,14 @@ const GameBoard = () => {
                 <button onClick={resetGame}>Restart</button>
             </GameBoardContainer>
         );
+    }
+
+    if (loading) {
+        return (
+            <GameBoardContainer>
+                <h1>Loading...</h1>
+            </GameBoardContainer>
+        )
     }
 
     return (
